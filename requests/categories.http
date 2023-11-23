@@ -1,0 +1,53 @@
+### endpoint /categories
+GET http://localhost:3000/categories
+
+### endpoint /categories/id
+GET http://localhost:3000/categories/5
+
+### Category not found
+GET http://localhost:3000/categories/26
+
+###
+GET http://localhost:3000/categories/hello
+
+### Add new category
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "Art"
+}
+
+### Remove category
+DELETE http://localhost:3000/categories/6
+
+### Testowanie poprawności body
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{"name":  ""}
+
+### Testowanie poprawności body #2 - hack my id!
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "Troll!"
+}
+
+### Testowanie poprawności body #3 - hack my fields...
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "Troll!",
+  "trollType": "Mountain"
+}
+
+### Test blednego id ktory jest stringiem
+GET http://localhost:3000/categories/something
+
+### Test blednego id ktory jest stringiem dla DELETE
+DELETE http://localhost:3000/categories/something
