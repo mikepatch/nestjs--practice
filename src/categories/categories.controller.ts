@@ -21,7 +21,7 @@ export class CategoriesController {
   }
 
   @Get()
-  getAll(): ICategory[] {
+  getAll(): readonly ICategory[] {
     return this.categoriesService.getAll();
   }
 
