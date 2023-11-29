@@ -4,11 +4,13 @@ import { IProduct } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoriesService } from '../categories/categories.service';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class ProductsService {
   private productId: number = productList.length;
   private products: IProduct[] = productList;
+  private logger = new Logger(ProductsService.name);
 
   constructor(private categoriesService: CategoriesService) {}
 
@@ -34,6 +36,7 @@ export class ProductsService {
     };
 
     this.products.push(newProduct);
+    this.logger.log(`Created product with id: ${newProduct.id}`);
     return newProduct;
   }
 
@@ -44,6 +47,12 @@ export class ProductsService {
   }
 
   getOneById(id: number): IProduct {
+    this.logger.verbose(`Read product id: ${id}`);
+    this.logger.debug(`Read product id: ${id}`);
+    this.logger.log(`Read product id: ${id}`);
+    this.logger.warn(`Read product id: ${id}`);
+    this.logger.error(`Read product id: ${id}`);
+    this.logger.fatal(`Read product id: ${id}`);
     return this.findProduct(id);
   }
 
