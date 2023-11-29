@@ -3,6 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
+  Logger,
   Param,
   ParseIntPipe,
   Post,
@@ -13,11 +16,15 @@ import { CategoriesService } from './categories.service';
 
 @Controller('categories')
 export class CategoriesController {
+  private logger = new Logger(CategoriesController.name);
+
   constructor(private categoriesService: CategoriesService) {}
 
   @Post()
-  addNewCategory(@Body() payload: NewCategoryDto) {
-    return this.categoriesService.createNew(payload);
+  addNew(@Body() category: NewCategoryDto): ICategory {
+    this.logger.log('About to add');
+    this.logger.log(category);
+    return this.categoriesService.createNew(category);
   }
 
   @Get()
@@ -25,13 +32,14 @@ export class CategoriesController {
     return this.categoriesService.getAll();
   }
 
-  @Get(':id')
-  getSingleCategory(@Param('id', ParseIntPipe) categoryId: number) {
+  @Get(':categoryId')
+  getOne(@Param('categoryId', ParseIntPipe) categoryId: number): ICategory {
     return this.categoriesService.getOneById(categoryId);
   }
 
-  @Delete(':id')
-  removeCategory(@Param('id', ParseIntPipe) categoryId: number) {
+  @Delete(':categoryId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return this.categoriesService.removeById(categoryId);
   }
 }

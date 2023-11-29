@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ICategory } from './category.interface';
 import { categoriesList } from './categories-list';
 import { NewCategoryDto } from './dto/new-category.dto';
@@ -6,6 +6,7 @@ import { NewCategoryDto } from './dto/new-category.dto';
 @Injectable()
 export class CategoriesService {
   private categories: ICategory[] = categoriesList;
+  private logger = new Logger(CategoriesService.name);
 
   private findCategory(id: number): ICategory {
     const category = this.categories.find((category) => category.id === id);
