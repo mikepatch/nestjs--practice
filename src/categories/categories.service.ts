@@ -5,7 +5,6 @@ import { NewCategoryDto } from './dto/new-category.dto';
 
 @Injectable()
 export class CategoriesService {
-  private nextId = 8;
   private categories: ICategory[] = categoriesList;
 
   private findCategory(id: number): ICategory {
