@@ -26,7 +26,7 @@ export class CategoriesService {
     return newCategory;
   }
 
-  getAll(): ICategory[] {
+  getAll(): readonly ICategory[] {
     return this.categories;
   }
 
