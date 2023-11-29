@@ -1,0 +1,62 @@
+### Create new product:
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Kubek",
+  "price": 18.25,
+  "description": "Napij się prosto z Cuba",
+  "image": "https://picsum.photos/id/30/1280/901",
+  "categoryId": 7,
+  "stock": 10
+}
+
+### Read products:
+GET http://localhost:3000/products
+
+### Read products (Expected ERROR 500):
+GET http://localhost:3000/products/test-file
+
+### Read product:
+GET http://localhost:3000/products/2
+
+### Read product (Expected ERROR 404):
+GET http://localhost:3000/products/999
+
+### Update product:
+PATCH http://localhost:3000/products/2
+Content-Type: application/json
+
+{
+  "categoryId": 7
+}
+
+### Update product (Expected ERROR 404):
+PATCH http://localhost:3000/products/2
+Content-Type: application/json
+
+{
+  "categoryId": 999
+}
+
+### Update product (Expected ERROR 404):
+PATCH http://localhost:3000/products/999
+Content-Type: application/json
+
+{
+  "categoryId": 1
+}
+
+### Update product (Expected ERROR 404):
+PATCH http://localhost:3000/products/2
+Content-Type: application/json
+
+{
+  "categoryId": 8
+}
+
+### Delete product:
+DELETE http://localhost:3000/products/1
+
+### Delete product (Expected ERROR 404):
+DELETE http://localhost:3000/products/999
