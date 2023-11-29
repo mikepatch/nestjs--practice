@@ -24,6 +24,7 @@ export class CategoriesService {
     const newCategory: ICategory = { id: this.generateNextId(), ...category };
 
     this.categories.push(newCategory);
+    this.logger.log(`Created category with id: ${newCategory.id}`);
     return newCategory;
   }
 
