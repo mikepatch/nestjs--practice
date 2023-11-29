@@ -10,16 +10,36 @@ GET http://localhost:3000/categories/26
 ###
 GET http://localhost:3000/categories/hello
 
-### Add new category
+### Add new category (with #1 token)
 POST http://localhost:3000/categories
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "name": "Art"
 }
 
+### Add new category (with #2 token)
+POST http://localhost:3000/categories
+Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq3g
+
+{
+  "name": "Supermarket"
+}
+
+### Add new category (with wrong token, Expected ERROR 403)
+POST http://localhost:3000/categories
+Content-Type: application/json
+Authorization: Bearer wrongtoken
+
+{
+  "name": "Grocery"
+}
+
 ### Remove category
 DELETE http://localhost:3000/categories/6
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 ### Testowanie poprawności body
 POST http://localhost:3000/categories
