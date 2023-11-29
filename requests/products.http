@@ -1,6 +1,7 @@
-### Create new product:
+### Create new product (with #1 token)
 POST http://localhost:3000/products
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "name": "Kubek",
@@ -11,19 +12,45 @@ Content-Type: application/json
   "stock": 10
 }
 
-### Read products:
-GET http://localhost:3000/products
+### Create new product (with #2 token)
+POST http://localhost:3000/products
+Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq3g
 
-### Read products (Expected ERROR 500):
+{
+  "name": "Szklanka",
+  "price": 10.5,
+  "description": "Łyknij się ze szklany",
+  "image": "https://picsum.photos/id/30/1280/901",
+  "categoryId": 7,
+  "stock": 20
+}
+
+### Read products
+GET http://localhost:3000/products
+Accept-Language: pl
+
+### Read products (Expected ERROR 500)
 GET http://localhost:3000/products/test-file
 
-### Read product:
+### Read products (Expected sample error)
+GET http://localhost:3000/products/sample-error
+
+### Read products (Expected sample error in polish)
+GET http://localhost:3000/products/sample-error
+Accept-Language: pl
+
+### Read product
 GET http://localhost:3000/products/2
 
-### Read product (Expected ERROR 404):
+### Read product (Expected ERROR 404)
 GET http://localhost:3000/products/999
 
-### Update product:
+### Read product (with some fake cookies)
+GET http://localhost:3000/products/90
+Set-Cookie: sessionId=38afes7a8; orderId=12;
+
+### Update product
 PATCH http://localhost:3000/products/2
 Content-Type: application/json
 
@@ -31,7 +58,7 @@ Content-Type: application/json
   "categoryId": 7
 }
 
-### Update product (Expected ERROR 404):
+### Update product (Expected ERROR 404)
 PATCH http://localhost:3000/products/2
 Content-Type: application/json
 
@@ -39,7 +66,7 @@ Content-Type: application/json
   "categoryId": 999
 }
 
-### Update product (Expected ERROR 404):
+### Update product (Expected ERROR 404)
 PATCH http://localhost:3000/products/999
 Content-Type: application/json
 
@@ -47,7 +74,7 @@ Content-Type: application/json
   "categoryId": 1
 }
 
-### Update product (Expected ERROR 404):
+### Update product (Expected ERROR 404)
 PATCH http://localhost:3000/products/2
 Content-Type: application/json
 
@@ -58,5 +85,5 @@ Content-Type: application/json
 ### Delete product:
 DELETE http://localhost:3000/products/1
 
-### Delete product (Expected ERROR 404):
+### Delete product (Expected ERROR 404)
 DELETE http://localhost:3000/products/999
