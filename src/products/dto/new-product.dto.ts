@@ -1,5 +1,4 @@
 import {
-  IsCurrency,
   IsInt,
   IsNotEmpty,
   IsNumber,
