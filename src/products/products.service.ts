@@ -8,7 +8,6 @@ import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class ProductsService {
-  private productId: number = productList.length;
   private products: IProduct[] = productList;
   private logger = new Logger(ProductsService.name);
 
