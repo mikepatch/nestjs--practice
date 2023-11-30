@@ -14,7 +14,7 @@ import {
 import { NewCategoryDto } from './dto/new-category.dto';
 import { ICategory } from './category.interface';
 import { CategoriesService } from './categories.service';
-import { ApiKeyGuard } from '../guards/api-key.guard';
+import { ApiKeyGuard } from '../../guards/api-key.guard';
 
 @Controller('categories')
 export class CategoriesController {
