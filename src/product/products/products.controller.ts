@@ -22,8 +22,8 @@ import { ProductsService } from './products.service';
 import {
   AcceptableLanguages,
   ClientLanguage,
-} from '../middlewares/client-language.decorator';
-import { ApiKeyGuard } from '../guards/api-key.guard';
+} from '../../middlewares/client-language.decorator';
+import { ApiKeyGuard } from '../../guards/api-key.guard';
 
 @Controller('products')
 export class ProductsController {
