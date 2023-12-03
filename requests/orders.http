@@ -1,0 +1,43 @@
+### Create new order
+POST http://localhost:3000/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 1,
+      "productId": 2,
+      "quantity": 50
+    },
+    {
+      "id": 2,
+      "productId": 4,
+      "quantity": 1
+    }
+  ]
+}
+
+### Create new order (Expected ERROR 404)
+POST http://localhost:3000/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 1,
+      "productId": 999,
+      "quantity": 2
+    }
+  ]
+}
+
+### Read orders
+GET http://localhost:3000/orders
+
+### Update order
+PATCH http://localhost:3000/orders/2
+Content-Type: application/json
+
+{
+  "status": "IN_PROGRESS"
+}
