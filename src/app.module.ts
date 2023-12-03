@@ -4,12 +4,12 @@ import { APP_FILTER } from '@nestjs/core';
 import * as path from 'path';
 
 import { AllErrorsFilter } from './errors/all-errors.filter';
-import { CategoriesController } from './categories/categories.controller';
-import { ProductsController } from './products/products.controller';
-import { ProductsService } from './products/products.service';
-import { CategoriesService } from './categories/categories.service';
 import { CookieCheckMiddleware } from './middlewares/cookie-check.middleware';
 import { LanguageExtractorMiddleware } from './middlewares/language-extractor.middleware';
+import { ProductModule } from './product/product.module';
+import { OrdersModule } from './orders/orders.module';
+import { SharedModule } from './shared/shared.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -23,13 +23,12 @@ import { LanguageExtractorMiddleware } from './middlewares/language-extractor.mi
         quietReqLogger: true,
       },
     }),
+    ProductModule,
+    OrdersModule,
+    SharedModule,
+    DatabaseModule,
   ],
-  controllers: [CategoriesController, ProductsController],
-  providers: [
-    ProductsService,
-    CategoriesService,
-    { provide: APP_FILTER, useClass: AllErrorsFilter },
-  ],
+  providers: [{ provide: APP_FILTER, useClass: AllErrorsFilter }],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
