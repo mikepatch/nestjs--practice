@@ -1,9 +1,12 @@
-import { ProductInOrder } from './product-in-order.interface';
+import { IProductInOrder } from './product-in-order.interface';
+
+export type TStatus = 'OPENED' | 'IN_PROGRESS' | 'SHIPPED' | 'CLOSED';
 
 export interface IOrder {
   id: number;
+  title: string;
   madeAt: Date;
-  products: ProductInOrder[];
-  status: 'OPENED' | 'IN_PROGRESS' | 'SHIPPED' | 'CLOSED';
+  products: IProductInOrder[];
+  status: TStatus;
   totalPrice: number;
 }
