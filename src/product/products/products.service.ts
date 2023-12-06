@@ -30,24 +30,34 @@ export class ProductsService {
   }
 
   async createNew(productDto: NewProductDto): Promise<IProduct> {
-    try {
-      const [newProductId] = await this.knex<IProduct>('products').insert({
-        ...productDto,
-      });
+    await this.categoriesService.getOneById(productDto.categoryId);
+    const [newProductId] = await this.knex<IProduct>('products').insert({
+      stock: 0,
+      ...productDto,
+    });
 
-      return this.getOneById(newProductId);
-    } catch (error) {
-      this.logger.error(error);
-      throw new BadRequestException(`Something went wrong. Please check logs.`);
-    }
+    const newProduct = await this.findProduct(newProductId);
+
+    this.logger.log(`Created product with id: ${newProduct}`);
+    return newProduct;
   }
 
-  getAll(): Promise<IProduct[]> {
-    try {
-      return this.knex<IProduct>('products');
-    } catch (error) {
-      throw new BadRequestException(`Something went wrong`);
+  async getAll(name: string = ''): Promise<IProduct[]> {
+    const query = this.knex<IProduct>('products');
+    if (name) {
+      query.whereLike('name', `%${name}%`);
     }
+
+    return query;
+  }
+
+  async checkProductOnStock(id: number, quantity: number) {
+    const product = await this.findProduct(id);
+    if (product.stock < quantity) {
+      throw new BadRequestException(`Product: ${id} is out of stock`);
+    }
+
+    return true;
   }
 
   getOneById(id: number): Promise<IProduct> {
@@ -58,23 +68,17 @@ export class ProductsService {
     id: number,
     partialProduct: UpdateProductDto,
   ): Promise<IProduct> {
-    this.logger.log(`Updating category ${id}`);
-    // this.categoriesService.getOneById(partialProduct.categoryId);
-    // const productToUpdate = this.findProduct(id);
-    // Object.assign(productToUpdate, partialProduct);
+    if (partialProduct.categoryId) {
+      await this.categoriesService.getOneById(partialProduct.categoryId);
+    }
 
-    return this.knex('products')
-      .where({ id })
-      .update({ ...partialProduct });
+    await this.knex<IProduct>('products').where({ id }).update(partialProduct);
 
-    // return this.getOneById(productToUpdateId);
+    return this.findProduct(id);
   }
 
-  async removeById(id: number): Promise<{ id: number; removed: number }> {
-    await this.getOneById(id);
-    const removed = await this.knex('products').where({ id }).delete();
-
-    this.logger.log(`Removing category ${id}`);
-    return { id, removed };
+  async removeById(id: number) {
+    await this.findProduct(id);
+    return this.knex('products').where({ id }).del();
   }
 }

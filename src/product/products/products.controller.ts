@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import * as fsp from 'node:fs/promises';
@@ -30,15 +31,15 @@ export class ProductsController {
 
   @Post()
   @UseGuards(ApiKeyGuard)
-  async addNew(@Body() product: NewProductDto): Promise<IProduct> {
+  addNew(@Body() product: NewProductDto) {
     this.logger.log('About to add');
     this.logger.log(product);
-    return await this.productsService.createNew(product);
+    return this.productsService.createNew(product);
   }
 
   @Get()
-  async getAll(): Promise<readonly IProduct[]> {
-    return await this.productsService.getAll();
+  getAll(@Query('name') searchByName: string) {
+    return this.productsService.getAll(searchByName);
   }
 
   // @Get('test-file')
@@ -46,20 +47,13 @@ export class ProductsController {
   //   try {
   //     const fileData = await fsp.readFile('not-existing-file.txt');
   //
-  //     return fileData;
+  //     return {fileData};
   //   } catch {
   //     throw new NotFoundException(
   //       'Missing file. Cannot find not-existing-file.txt',
   //     );
   //   }
   // }
-
-  @Get('test-file')
-  async getAllFromFile() {
-    const fileData = await fsp.readFile('not-existing-file.txt');
-
-    return { fileData };
-  }
 
   @Get('sample-error')
   async getSampleError(@ClientLanguage() lang: SupportedLanguages) {
@@ -70,19 +64,24 @@ export class ProductsController {
     );
   }
 
+  @Get('test-file')
+  async getAllFromFile() {
+    const fileData = await fsp.readFile('not-existing-file.txt');
+
+    return { fileData };
+  }
+
   @Get(':productId')
-  async getOne(
-    @Param('productId', ParseIntPipe) productId: number,
-  ): Promise<IProduct> {
-    return await this.productsService.getOneById(productId);
+  getOne(@Param('productId', ParseIntPipe) productId: number) {
+    return this.productsService.getOneById(productId);
   }
 
   @Patch(':productId')
-  async update(
+  update(
     @Param('productId', ParseIntPipe) productId: number,
     @Body() product: UpdateProductDto,
-  ): Promise<IProduct> {
-    return await this.productsService.update(productId, product);
+  ) {
+    return this.productsService.update(productId, product);
   }
 
   @Delete(':productId')
