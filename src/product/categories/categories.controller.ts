@@ -9,12 +9,13 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { NewCategoryDto } from './dto/new-category.dto';
-import { ICategory } from './category.interface';
 import { CategoriesService } from './categories.service';
 import { ApiKeyGuard } from '../../guards/api-key.guard';
+import { CategoryModel } from './category.model';
 
 @Controller('categories')
 export class CategoriesController {
@@ -24,21 +25,21 @@ export class CategoriesController {
 
   @Post()
   @UseGuards(ApiKeyGuard)
-  addNew(@Body() category: NewCategoryDto): Promise<ICategory> {
+  addNew(@Body() category: NewCategoryDto): Promise<CategoryModel> {
     this.logger.log('About to add');
     this.logger.log(category);
     return this.categoriesService.createNew(category);
   }
 
   @Get()
-  getAll(): Promise<ICategory[]> {
-    return this.categoriesService.getAll();
+  getAll(@Query('name') searchByName: string): Promise<CategoryModel[]> {
+    return this.categoriesService.getAll(searchByName);
   }
 
   @Get(':categoryId')
   getOne(
     @Param('categoryId', ParseIntPipe) categoryId: number,
-  ): Promise<ICategory> {
+  ): Promise<CategoryModel> {
     return this.categoriesService.getOneById(categoryId);
   }
 
