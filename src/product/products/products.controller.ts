@@ -11,7 +11,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import * as fsp from 'node:fs/promises';
