@@ -15,7 +15,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import * as fsp from 'node:fs/promises';
-import { IProduct } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
