@@ -1,4 +1,5 @@
 import type { Knex } from 'knex';
+import { knexSnakeCaseMappers } from 'objection';
 
 // Update with your config settings.
 
@@ -16,6 +17,7 @@ const knexConfig: { [key: string]: Knex.Config } = {
     seeds: {
       directory: './src/database/seeds',
     },
+    ...knexSnakeCaseMappers(),
   },
 };
 
