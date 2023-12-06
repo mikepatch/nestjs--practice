@@ -6,13 +6,15 @@ Content-Type: application/json
   "products": [
     {
       "id": 1,
-      "productId": 2,
-      "quantity": 50
+      "quantity": 1
     },
     {
       "id": 2,
-      "productId": 4,
       "quantity": 1
+    },
+    {
+      "id": 3,
+      "quantity": 2
     }
   ]
 }
