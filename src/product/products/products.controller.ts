@@ -31,15 +31,15 @@ export class ProductsController {
 
   @Post()
   @UseGuards(ApiKeyGuard)
-  addNew(@Body() product: NewProductDto): IProduct {
+  async addNew(@Body() product: NewProductDto): Promise<IProduct> {
     this.logger.log('About to add');
     this.logger.log(product);
-    return this.productsService.createNew(product);
+    return await this.productsService.createNew(product);
   }
 
   @Get()
-  getAll(@Query('name') searchByName: string): readonly IProduct[] {
-    return this.productsService.getAll(searchByName);
+  async getAll(): Promise<readonly IProduct[]> {
+    return await this.productsService.getAll();
   }
 
   // @Get('test-file')
@@ -72,16 +72,18 @@ export class ProductsController {
   }
 
   @Get(':productId')
-  getOne(@Param('productId', ParseIntPipe) productId: number): IProduct {
-    return this.productsService.getOneById(productId);
+  async getOne(
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<IProduct> {
+    return await this.productsService.getOneById(productId);
   }
 
   @Patch(':productId')
-  update(
+  async update(
     @Param('productId', ParseIntPipe) productId: number,
     @Body() product: UpdateProductDto,
-  ): IProduct {
-    return this.productsService.update(productId, product);
+  ): Promise<IProduct> {
+    return await this.productsService.update(productId, product);
   }
 
   @Delete(':productId')

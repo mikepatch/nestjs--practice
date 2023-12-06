@@ -1,20 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { productList } from './product-list';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { IProduct } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoriesService } from '../categories/categories.service';
 import { Logger } from '@nestjs/common';
+import { Knex } from 'knex';
 
 @Injectable()
 export class ProductsService {
-  private products: IProduct[] = productList;
   private logger = new Logger(ProductsService.name);
 
-  constructor(private categoriesService: CategoriesService) {}
+  constructor(
+    private categoriesService: CategoriesService,
+    @Inject('DbConnection') private readonly knex: Knex,
+  ) {}
 
-  private findProduct(id: number): IProduct {
-    const product = this.products.find((p) => p.id === id);
+  private async findProduct(id: number): Promise<IProduct> {
+    const product = await this.knex<IProduct>('products').where({ id }).first();
     if (!product) {
       throw new NotFoundException(`Product with id: ${id} was not found`);
     }
@@ -22,49 +29,52 @@ export class ProductsService {
     return product;
   }
 
-  private generateNextId() {
-    return Math.max(...this.products.map((product) => product.id)) + 1;
+  async createNew(productDto: NewProductDto): Promise<IProduct> {
+    try {
+      const [newProductId] = await this.knex<IProduct>('products').insert({
+        ...productDto,
+      });
+
+      return this.getOneById(newProductId);
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(`Something went wrong. Please check logs.`);
+    }
   }
 
-  createNew(product: NewProductDto): IProduct {
-    this.categoriesService.getOneById(product.categoryId);
-    const newProduct: IProduct = {
-      id: this.generateNextId(),
-      stock: 0,
-      ...product,
-    };
-
-    this.products.push(newProduct);
-    this.logger.log(`Created product with id: ${newProduct.id}`);
-    return newProduct;
+  getAll(): Promise<IProduct[]> {
+    try {
+      return this.knex<IProduct>('products');
+    } catch (error) {
+      throw new BadRequestException(`Something went wrong`);
+    }
   }
 
-  getAll(name: string = ''): readonly IProduct[] {
-    return this.products.filter((product) =>
-      product.name.toLowerCase().includes(name.toLowerCase()),
-    );
-  }
-
-  getOneById(id: number): IProduct {
-    this.logger.verbose(`Read product id: ${id}`);
-    this.logger.debug(`Read product id: ${id}`);
-    this.logger.log(`Read product id: ${id}`);
-    this.logger.warn(`Read product id: ${id}`);
-    this.logger.error(`Read product id: ${id}`);
-    this.logger.fatal(`Read product id: ${id}`);
+  getOneById(id: number): Promise<IProduct> {
     return this.findProduct(id);
   }
 
-  update(id: number, partialProduct: UpdateProductDto): IProduct {
-    this.categoriesService.getOneById(partialProduct.categoryId);
-    const productToUpdate = this.findProduct(id);
-    Object.assign(productToUpdate, partialProduct);
+  async update(
+    id: number,
+    partialProduct: UpdateProductDto,
+  ): Promise<IProduct> {
+    this.logger.log(`Updating category ${id}`);
+    // this.categoriesService.getOneById(partialProduct.categoryId);
+    // const productToUpdate = this.findProduct(id);
+    // Object.assign(productToUpdate, partialProduct);
 
-    return productToUpdate;
+    return this.knex('products')
+      .where({ id })
+      .update({ ...partialProduct });
+
+    // return this.getOneById(productToUpdateId);
   }
 
-  removeById(id: number): void {
-    this.findProduct(id);
-    this.products = this.products.filter((product) => product.id !== id);
+  async removeById(id: number): Promise<{ id: number; removed: number }> {
+    await this.getOneById(id);
+    const removed = await this.knex('products').where({ id }).delete();
+
+    this.logger.log(`Removing category ${id}`);
+    return { id, removed };
   }
 }
