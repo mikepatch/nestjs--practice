@@ -10,7 +10,6 @@ import {
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { IOrder } from './model/order.interface';
 import { OrderModel } from './model/order.model';
 
 @Controller('orders')

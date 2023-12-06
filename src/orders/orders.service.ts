@@ -1,8 +1,7 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ProductsService } from '../product/products/products.service';
-import { IOrder } from './model/order.interface';
 import { IProductInOrder } from './model/product-in-order.interface';
 import { OrderModel } from './model/order.model';
 import { ModelClass } from 'objection';
