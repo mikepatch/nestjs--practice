@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import { APP_FILTER } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 
 import { AllErrorsFilter } from './errors/all-errors.filter';
@@ -13,6 +14,7 @@ import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'debug',
