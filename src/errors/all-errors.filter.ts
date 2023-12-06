@@ -7,10 +7,23 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { SqliteError } from 'better-sqlite3';
 
 @Catch(Error)
 export class AllErrorsFilter implements ExceptionFilter {
   private logger = new Logger(AllErrorsFilter.name);
+
+  private wrapInEnvelope(
+    message: string,
+    statusCode = 500,
+    error = 'Internal Server Error',
+  ) {
+    return {
+      message,
+      error,
+      statusCode,
+    };
+  }
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -41,6 +54,14 @@ export class AllErrorsFilter implements ExceptionFilter {
         error: 'Internal Server Error',
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
+    }
+
+    if (exception instanceof SqliteError) {
+      this.logger.error(exception);
+
+      return response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(this.wrapInEnvelope('DB query error'));
     }
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
