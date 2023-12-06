@@ -1,45 +1,61 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ICategory } from './category.interface';
-import { categoriesList } from './categories-list';
 import { NewCategoryDto } from './dto/new-category.dto';
+import { Knex } from 'knex';
 
 @Injectable()
 export class CategoriesService {
-  private categories: ICategory[] = categoriesList;
   private logger = new Logger(CategoriesService.name);
 
-  private findCategory(id: number): ICategory {
-    const category = this.categories.find((category) => category.id === id);
+  constructor(@Inject('DbConnection') private readonly knex: Knex) {}
+
+  private async find(id: number): Promise<ICategory> {
+    this.logger.debug(`Searching for category ${id}`);
+    const category = await this.knex<ICategory>('categories')
+      .where({ id })
+      .first();
     if (!category) {
       throw new NotFoundException(`Category with id ${id} was not found`);
     }
+
     return category;
   }
 
-  private generateNextId(): number {
-    return Math.max(...this.categories.map((category) => category.id)) + 1;
+  async createNew(categoryDto: NewCategoryDto): Promise<ICategory> {
+    try {
+      const [newCategoryId] = await this.knex<ICategory>('categories').insert({
+        ...categoryDto,
+      });
+
+      return this.getOneById(newCategoryId);
+    } catch (error) {
+      if (error?.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        throw new BadRequestException(
+          `Category named "${categoryDto.name}" already exists`,
+        );
+      }
+    }
   }
 
-  createNew(category: NewCategoryDto): ICategory {
-    const newCategory: ICategory = { id: this.generateNextId(), ...category };
-
-    this.categories.push(newCategory);
-    this.logger.log(`Created category with id: ${newCategory.id}`);
-    return newCategory;
+  getAll(): Promise<ICategory[]> {
+    return this.knex<ICategory>('categories');
   }
 
-  getAll(): readonly ICategory[] {
-    return this.categories;
+  getOneById(id: number): Promise<ICategory> {
+    return this.find(id);
   }
 
-  getOneById(id: number): ICategory {
-    return this.findCategory(id);
-  }
+  async removeById(id: number): Promise<{ id: number; removed: number }> {
+    await this.getOneById(id);
+    const removed = await this.knex('categories').where({ id }).delete();
 
-  removeById(id: number): { id: number; removed: boolean } {
-    this.findCategory(id);
-    this.categories = this.categories.filter((category) => category.id !== id);
-
-    return { id: id, removed: true };
+    this.logger.log(`Removing category ${id}`);
+    return { id, removed };
   }
 }

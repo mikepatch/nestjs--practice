@@ -44,12 +44,14 @@ Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 ### Testowanie poprawności body
 POST http://localhost:3000/categories
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {"name":  ""}
 
 ### Testowanie poprawności body #2 - hack my id!
 POST http://localhost:3000/categories
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "id": 2,
@@ -59,6 +61,7 @@ Content-Type: application/json
 ### Testowanie poprawności body #3 - hack my fields...
 POST http://localhost:3000/categories
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "id": 2,
@@ -71,3 +74,5 @@ GET http://localhost:3000/categories/something
 
 ### Test blednego id ktory jest stringiem dla DELETE
 DELETE http://localhost:3000/categories/something
+Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a

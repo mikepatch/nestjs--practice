@@ -24,19 +24,21 @@ export class CategoriesController {
 
   @Post()
   @UseGuards(ApiKeyGuard)
-  addNew(@Body() category: NewCategoryDto): ICategory {
+  addNew(@Body() category: NewCategoryDto): Promise<ICategory> {
     this.logger.log('About to add');
     this.logger.log(category);
     return this.categoriesService.createNew(category);
   }
 
   @Get()
-  getAll(): readonly ICategory[] {
+  getAll(): Promise<ICategory[]> {
     return this.categoriesService.getAll();
   }
 
   @Get(':categoryId')
-  getOne(@Param('categoryId', ParseIntPipe) categoryId: number): ICategory {
+  getOne(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ): Promise<ICategory> {
     return this.categoriesService.getOneById(categoryId);
   }
 
