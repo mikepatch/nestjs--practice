@@ -1,7 +1,5 @@
-import { IProduct } from '../../product/products/product.interface';
-
 export interface IProductInOrder {
   id: number;
-  productId: IProduct['id'];
+  productId: number;
   quantity: number;
 }
