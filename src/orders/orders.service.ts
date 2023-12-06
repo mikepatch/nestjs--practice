@@ -1,36 +1,43 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ProductsService } from '../product/products/products.service';
 import { IOrder } from './model/order.interface';
 import { IProductInOrder } from './model/product-in-order.interface';
+import { OrderModel } from './model/order.model';
+import { ModelClass } from 'objection';
 
 @Injectable()
 export class OrdersService {
-  private orders: IOrder[] = [
-    {
-      id: 1,
-      title: 'test',
-      madeAt: new Date(),
-      status: 'OPENED',
-      products: [{ id: 1, productId: 2, quantity: 5 }],
-      totalPrice: 200,
-    },
-  ];
+  private logger = new Logger(OrdersService.name);
 
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private productsService: ProductsService,
+    @Inject('OrderModel') private readonly orderModel: ModelClass<OrderModel>,
+  ) {}
 
-  private findOrder(id: number): IOrder {
-    const order = this.orders.find((order) => order.id === id);
-    if (!order) {
-      throw new NotFoundException(`Order with id: ${id} was not found`);
-    }
-
-    return order;
+  private async findOrder(id: number): Promise<OrderModel> {
+    return this.orderModel
+      .query()
+      .findById(id)
+      .withGraphFetched('products')
+      .throwIfNotFound(`Order with id: ${id} was not found`);
   }
 
-  private generateNextId(): number {
-    return Math.max(...this.orders.map((product) => product.id)) + 1;
+  private async generateNextTitle() {
+    const currentYear = new Date().getFullYear();
+    const nextYear = currentYear + 1;
+    const allOrdersFromThisYear = await this.orderModel
+      .query()
+      .whereBetween('madeAt', [
+        `${currentYear}-01-01 00:00:00`,
+        `${nextYear}-01-01 00:00:00`,
+      ])
+      .resultSize();
+
+    const nextOrderNumber = allOrdersFromThisYear + 1;
+
+    return `${nextOrderNumber}/${currentYear}`;
   }
 
   private validateProductIds = (products: IProductInOrder[]) =>
@@ -39,67 +46,57 @@ export class OrdersService {
     );
 
   private validateProductStock = (products: IProductInOrder[]) =>
-    products.forEach((product) => {
-      const productToCheck = this.productsService.getOneById(product.productId);
-      if (productToCheck.stock < product.quantity) {
-        throw new NotFoundException(
-          `Product ${productToCheck.id} is out of stock`,
-        );
-      }
-    });
-
-  create(order: CreateOrderDto): IOrder {
-    this.validateProductIds(order.products);
-    this.validateProductStock(order.products);
-
-    const newOrder: IOrder = {
-      id: this.generateNextId(),
-      madeAt: new Date(),
-      status: 'OPENED',
-      totalPrice: order.products.reduce((acc, currValue) => {
-        const currValueProduct = this.productsService.getOneById(
-          currValue.productId,
-        );
-        const currValueProductPrice =
-          currValueProduct.price * currValue.quantity;
-        return acc + currValueProductPrice;
-      }, 0),
-      ...order,
-    };
-
-    order.products.forEach((product) => {
-      const productToUpdate = this.productsService.getOneById(
+    products.forEach(async (product) => {
+      return await this.productsService.checkProductOnStock(
         product.productId,
+        product.quantity,
       );
-      this.productsService.update(product.productId, {
-        ...productToUpdate,
-        stock: productToUpdate.stock - product.quantity,
-      });
     });
 
-    this.orders.push(newOrder);
-    return newOrder;
+  async createNew(orderDto: CreateOrderDto): Promise<OrderModel> {
+    let totalPrice = 0;
+    for (const { id, quantity } of orderDto.products) {
+      const product = await this.productsService.checkProductOnStock(
+        id,
+        quantity,
+      );
+      totalPrice += product.price * quantity;
+    }
+
+    const order = await this.orderModel.query().insert({
+      title: await this.generateNextTitle(),
+      totalPrice,
+    });
+
+    for (const product of orderDto.products) {
+      await order.$relatedQuery('products').relate(product);
+    }
+
+    return order;
   }
 
-  getAll(): readonly IOrder[] {
-    return this.orders;
+  async getAll(): Promise<readonly OrderModel[]> {
+    return this.orderModel.query().withGraphFetched('products');
   }
 
-  getOneById(id: number): IOrder {
+  getOneById(id: number): Promise<OrderModel> {
     return this.findOrder(id);
   }
 
-  update(id: number, partialOrder: UpdateOrderDto): IOrder {
-    const orderToUpdate = this.findOrder(id);
-    Object.assign(orderToUpdate, partialOrder);
-
-    return orderToUpdate;
+  async update(id: number, partialOrder: UpdateOrderDto): Promise<OrderModel> {
+    if (partialOrder.products) {
+      this.validateProductIds(partialOrder.products);
+      this.validateProductStock(partialOrder.products);
+    }
+    const orderToUpdate = await this.orderModel.query().findById(id);
+    return orderToUpdate.$query().updateAndFetch(partialOrder);
   }
 
-  removeById(id: number): { id: number; removed: boolean } {
-    this.findOrder(id);
-    this.orders = this.orders.filter((order) => order.id !== id);
+  async removeById(id: number): Promise<{ id: number; removed: number }> {
+    await this.getOneById(id);
+    const removed = await this.orderModel.query().deleteById(id);
 
-    return { id, removed: true };
+    this.logger.log(`Removing category ${id}`);
+    return { id, removed };
   }
 }

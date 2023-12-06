@@ -8,10 +8,6 @@ export class CreateOrderDto {
   products: IProductInOrder[];
 
   @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @IsString()
   @IsOptional()
   status?: TStatus;
 }

@@ -11,31 +11,32 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { IOrder } from './model/order.interface';
+import { OrderModel } from './model/order.model';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto): IOrder {
-    return this.ordersService.create(createOrderDto);
+  async create(@Body() createOrderDto: CreateOrderDto): Promise<OrderModel> {
+    return await this.ordersService.createNew(createOrderDto);
   }
 
   @Get()
-  getAll(): readonly IOrder[] {
-    return this.ordersService.getAll();
+  async getAll(): Promise<readonly OrderModel[]> {
+    return await this.ordersService.getAll();
   }
 
   @Get(':id')
-  getOne(@Param('id') id: string): IOrder {
-    return this.ordersService.getOneById(+id);
+  getOne(@Param('id') id: number): Promise<OrderModel> {
+    return this.ordersService.getOneById(id);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: number,
     @Body() updateOrderDto: UpdateOrderDto,
-  ): IOrder {
+  ): Promise<OrderModel> {
     return this.ordersService.update(id, updateOrderDto);
   }
 
