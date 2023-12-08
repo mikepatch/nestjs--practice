@@ -5,12 +5,14 @@ import { ProductsService } from './products/products.service';
 import { CategoriesService } from './categories/categories.service';
 import { ProductModel } from './products/product.model';
 import { CategoryModel } from './categories/category.model';
+import { CategoriesRepository } from './categories/categories.repository';
 
 @Module({
   controllers: [CategoriesController, ProductsController],
   providers: [
     ProductsService,
     CategoriesService,
+    CategoriesRepository,
     { provide: 'ProductModel', useValue: ProductModel },
     { provide: 'CategoryModel', useValue: CategoryModel },
   ],
