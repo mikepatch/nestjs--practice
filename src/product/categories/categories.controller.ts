@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Logger,
   Param,
   ParseIntPipe,
@@ -44,7 +42,6 @@ export class CategoriesController {
   }
 
   @Delete(':categoryId')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(ApiKeyGuard)
   remove(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return this.categoriesService.removeById(categoryId);
