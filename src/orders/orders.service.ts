@@ -1,12 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsService } from '../product/products/products.service';
 import { OrdersRepository } from './orders.repository';
 
 @Injectable()
 export class OrdersService {
-  private logger = new Logger(OrdersService.name);
-
   constructor(
     private productsService: ProductsService,
     private readonly ordersRepository: OrdersRepository,
