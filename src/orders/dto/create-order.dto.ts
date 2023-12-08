@@ -1,13 +1,25 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { IProductInOrder } from '../model/product-in-order.interface';
-import { TStatus } from '../model/order.interface';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsInt,
+  IsPositive,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class OrderedProduct {
+  @IsPositive()
+  @IsInt()
+  id: number;
+
+  @IsPositive()
+  quantity: number;
+}
 
 export class CreateOrderDto {
   @IsArray()
-  @IsNotEmpty()
-  products: IProductInOrder[];
-
-  @IsString()
-  @IsOptional()
-  status?: TStatus;
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => OrderedProduct)
+  products: OrderedProduct[];
 }
