@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { SqliteError } from 'better-sqlite3';
+import * as process from 'process';
 
 @Catch(Error)
 export class AllErrorsFilter implements ExceptionFilter {
@@ -15,6 +16,7 @@ export class AllErrorsFilter implements ExceptionFilter {
 
   private wrapInEnvelope(
     message: string,
+    exception?: HttpException,
     statusCode = 500,
     error = 'Internal Server Error',
   ) {
@@ -22,6 +24,7 @@ export class AllErrorsFilter implements ExceptionFilter {
       message,
       error,
       statusCode,
+      exception,
     };
   }
 
@@ -49,11 +52,15 @@ export class AllErrorsFilter implements ExceptionFilter {
         'EISDIR',
       ].includes(exception?.code)
     ) {
-      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        message: 'File i/o error (check logs)',
-        error: 'Internal Server Error',
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+      if (process.env.NODE_ENV === 'development') {
+        return response
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(this.wrapInEnvelope('File i/o error (check logs)', exception));
+      }
+
+      return response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(this.wrapInEnvelope('File i/o error (check logs)'));
     }
 
     if (exception instanceof SqliteError) {
@@ -64,10 +71,8 @@ export class AllErrorsFilter implements ExceptionFilter {
         .json(this.wrapInEnvelope('DB query error'));
     }
 
-    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Unknown error',
-      error: 'Internal Server Error',
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-    });
+    response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json(this.wrapInEnvelope('Unknown error'));
   }
 }
