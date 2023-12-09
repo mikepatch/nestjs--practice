@@ -1,18 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { LanguageService } from './language.service';
 
 describe('LanguageService', () => {
   let service: LanguageService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [LanguageService],
-    }).compile();
-
-    service = module.get<LanguageService>(LanguageService);
+    service = new LanguageService();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should return languages: en, pl as supported by this project', () => {
+    expect(service.supportedLanguages()).toEqual(['en', 'pl']);
   });
 });
