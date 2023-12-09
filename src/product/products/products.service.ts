@@ -16,7 +16,7 @@ export class ProductsService {
     private readonly productModel: ModelClass<ProductModel>,
   ) {}
 
-  private async findProduct(id: number) {
+  async findProduct(id: number) {
     return this.productModel
       .query()
       .findById(id)
@@ -31,7 +31,7 @@ export class ProductsService {
       ...productDto,
     });
 
-    this.logger.log(`Created product with id: ${newProduct}`);
+    this.logger.log(`Created product with id: ${newProduct.id}`);
     return newProduct;
   }
 
@@ -69,6 +69,8 @@ export class ProductsService {
 
   async removeById(id: number) {
     await this.findProduct(id);
-    return this.productModel.query().deleteById(id);
+    const removed = await this.productModel.query().deleteById(id);
+
+    return { id, removed };
   }
 }
