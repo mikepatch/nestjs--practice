@@ -4,8 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Logger,
   Param,
   ParseIntPipe,
@@ -84,8 +82,9 @@ export class ProductsController {
   }
 
   @Delete(':productId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('productId', ParseIntPipe) productId: number) {
+  remove(
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<{ id: number; removed: number }> {
     return this.productsService.removeById(productId);
   }
 }
