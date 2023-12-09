@@ -7,7 +7,7 @@ Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
   "name": "Kubek",
   "price": 18.25,
   "description": "Napij się prosto z Cuba",
-  "image": "https://picsum.photos/id/30/1280/901",
+  "imgUrl": "https://picsum.photos/id/30/1280/901",
   "categoryId": 7,
   "stock": 10
 }
@@ -83,7 +83,7 @@ Content-Type: application/json
 }
 
 ### Delete product:
-DELETE http://localhost:3000/products/1
+DELETE http://localhost:3000/products/21
 
 ### Delete product (Expected ERROR 404)
 DELETE http://localhost:3000/products/999
