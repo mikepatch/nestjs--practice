@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { NewCategoryDto } from './dto/new-category.dto';
-import { CategoryModel } from './category.model';
 import { CategoriesRepository } from './categories.repository';
 
 @Injectable()
@@ -11,11 +10,11 @@ export class CategoriesService {
     return this.categoriesRepository.createNew(categoryDto);
   }
 
-  getAll(name: string = ''): Promise<CategoryModel[]> {
+  getAll(name: string = '') {
     return this.categoriesRepository.getAll(name);
   }
 
-  getOneById(id: number): Promise<CategoryModel> {
+  getOneById(id: number) {
     return this.categoriesRepository.getOneById(id);
   }
 
