@@ -12,7 +12,7 @@ export class LanguageExtractorMiddleware implements NestMiddleware {
     );
   }
 
-  use(req: any, res: any, next: () => void) {
+  use(req: Request, res: Response, next: () => void) {
     req['language'] = acceptLanguage.get(req.headers['accept-language']);
     next();
   }
